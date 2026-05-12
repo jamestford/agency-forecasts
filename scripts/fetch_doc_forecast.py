@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Download the DOC procurement forecast using Playwright, only commit on change.
+"""Download the DOC procurement forecast using Camoufox.
 
-Plain HTTP fetchers get 403'd by Cloudflare bot challenges on commerce.gov.
-A real browser (headless Chromium) clears the challenge and reuses those
-cookies/TLS fingerprint when fetching each linked document.
+commerce.gov is behind Cloudflare's managed challenge. Plain HTTP fetchers
+and even stock headless Chromium get blocked. Camoufox is a custom-patched
+Firefox build designed to defeat CF's automation detection.
 
 Writes the latest file to current/ and emits GitHub Actions outputs the
 workflow uses to decide whether to commit.
@@ -22,8 +22,7 @@ from io import BytesIO
 from pathlib import Path
 from xml.etree import ElementTree as ET
 
-from playwright.async_api import async_playwright
-from playwright_stealth import stealth_async
+from camoufox.async_api import AsyncCamoufox
 
 PAGE_URL = "https://www.commerce.gov/oam/industry/procurement-forecasts"
 ALLOWED_HOST = "www.commerce.gov"
@@ -34,14 +33,8 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 CURRENT_DIR = REPO_ROOT / "current"
 METADATA_PATH = CURRENT_DIR / "metadata.json"
 
-UA = (
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-)
-
 
 def parse_xlsx_modified(data: bytes) -> str | None:
-    """Read dcterms:modified out of an XLSX's docProps/core.xml."""
     try:
         with zipfile.ZipFile(BytesIO(data)) as zf:
             with zf.open("docProps/core.xml") as f:
@@ -71,51 +64,43 @@ async def main() -> int:
         prior_meta = json.loads(METADATA_PATH.read_text())
     prior_by_name = {f["filename"]: f for f in prior_meta.get("files", [])}
 
-    async with async_playwright() as p:
-        launch_kwargs = dict(
-            headless=True,
-            args=[
-                "--disable-blink-features=AutomationControlled",
-                "--no-sandbox",
-                "--disable-features=IsolateOrigins,site-per-process",
-            ],
-        )
-        if os.environ.get("USE_SYSTEM_CHROME") == "1":
-            launch_kwargs["channel"] = "chrome"
-        browser = await p.chromium.launch(**launch_kwargs)
-        context = await browser.new_context(
-            user_agent=UA,
-            viewport={"width": 1280, "height": 800},
-            locale="en-US",
-            timezone_id="America/New_York",
-            extra_http_headers={
-                "Accept-Language": "en-US,en;q=0.9",
-                "Sec-Ch-Ua": '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
-                "Sec-Ch-Ua-Mobile": "?0",
-                "Sec-Ch-Ua-Platform": '"macOS"',
-            },
-        )
-        page = await context.new_page()
-        await stealth_async(page)
+    async with AsyncCamoufox(
+        headless=True,
+        humanize=True,
+        locale="en-US",
+        geoip=True,
+        os=["macos", "windows"],
+        i_know_what_im_doing=True,
+    ) as browser:
+        page = await browser.new_page()
 
         print(f"[fetch] GET {PAGE_URL}", flush=True)
-        await page.goto(PAGE_URL, wait_until="domcontentloaded", timeout=90000)
+        await page.goto(PAGE_URL, wait_until="domcontentloaded", timeout=120000)
 
-        title = await page.title()
-        max_attempts = 90
-        for attempt in range(max_attempts):
+        title = ""
+        for attempt in range(90):
             title = await page.title()
-            if "moment" not in title.lower() and "challenge" not in title.lower():
-                break
-            if attempt % 5 == 0:
-                print(f"[fetch] waiting for CF (attempt {attempt+1}/{max_attempts}, title={title!r})", flush=True)
+            t = title.lower()
+            if title and "moment" not in t and "challenge" not in t:
+                link_count = await page.evaluate("document.querySelectorAll('a[href]').length")
+                if link_count > 5:
+                    break
+                if attempt % 5 == 0:
+                    print(f"[fetch] title cleared ({title!r}) but only {link_count} links — waiting", flush=True)
+            elif attempt % 5 == 0:
+                print(f"[fetch] waiting for CF (attempt {attempt+1}/90, title={title!r})", flush=True)
             await asyncio.sleep(2)
         else:
             html = await page.content()
             (CURRENT_DIR / "_blocked-snapshot.html").write_text(html)
-            raise RuntimeError(f"CF challenge did not clear; final title={title!r}.")
+            raise RuntimeError(f"Did not reach forecast page; final title={title!r}.")
 
         print(f"[fetch] page loaded, title={title!r}", flush=True)
+
+        try:
+            await page.wait_for_load_state("networkidle", timeout=15000)
+        except Exception:
+            pass  # not critical; we have content
 
         hrefs: list[str] = await page.eval_on_selector_all(
             "a[href]", "els => els.map(e => e.href)"
@@ -149,7 +134,7 @@ async def main() -> int:
         for url in doc_links:
             filename = urllib.parse.unquote(url.rsplit("/", 1)[-1])
             print(f"[fetch] downloading {filename}", flush=True)
-            response = await context.request.get(url)
+            response = await page.context.request.get(url)
             if not response.ok:
                 raise RuntimeError(f"Download failed for {url}: HTTP {response.status}")
             body = await response.body()
@@ -185,8 +170,6 @@ async def main() -> int:
                 print(f"  -> unchanged (sha matches prior; last changed {meta['last_changed_utc']})", flush=True)
 
             files_meta.append(meta)
-
-        await browser.close()
 
     if any_changed:
         metadata = {

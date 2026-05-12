@@ -25,16 +25,16 @@ jobs:
           cache: pip
           cache-dependency-path: requirements.txt
 
-      - name: Install Python deps + Chrome
+      - name: Install Python deps
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          playwright install --with-deps chrome
+
+      - name: Fetch Camoufox browser binary + GeoIP DB
+        run: python -m camoufox fetch
 
       - id: fetch
         name: Fetch DOC forecast
-        env:
-          USE_SYSTEM_CHROME: "1"
         run: python scripts/fetch_doc_forecast.py
 
       - name: Commit and push if changed

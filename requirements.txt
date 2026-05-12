@@ -1,2 +1,1 @@
-playwright==1.49.0
-tf-playwright-stealth==1.2.0
+camoufox[geoip]==0.4.11
