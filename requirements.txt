@@ -1,1 +1,2 @@
 camoufox[geoip]==0.4.11
+openpyxl==3.1.5

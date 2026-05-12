@@ -15,6 +15,8 @@ import base64
 import hashlib
 import json
 import os
+import re
+import shutil
 import sys
 import urllib.parse
 import zipfile
@@ -25,6 +27,9 @@ from xml.etree import ElementTree as ET
 
 from camoufox.async_api import AsyncCamoufox
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import xlsx_diff
+
 PAGE_URL = "https://www.commerce.gov/oam/industry/procurement-forecasts"
 ALLOWED_HOST = "www.commerce.gov"
 DOC_EXTENSIONS = (".xlsx", ".xls", ".pdf", ".doc", ".docx", ".csv")
@@ -32,7 +37,9 @@ FORECAST_KEYWORDS = ("forecast",)
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 CURRENT_DIR = REPO_ROOT / "current"
+ARCHIVE_DIR = REPO_ROOT / "archive"
 METADATA_PATH = CURRENT_DIR / "metadata.json"
+DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
 def parse_xlsx_modified(data: bytes) -> str | None:
@@ -93,6 +100,21 @@ async def fetch_via_browser(page, url: str) -> tuple[bytes, dict]:
         "content-type": result.get("contentType"),
     }
     return base64.b64decode(result["base64"]), headers
+
+
+def _find_prior_xlsx(filename: str, today: str) -> Path | None:
+    """Return the path to the most recent prior archive copy of this file, or None."""
+    if not ARCHIVE_DIR.exists():
+        return None
+    dated = sorted(
+        d for d in ARCHIVE_DIR.iterdir()
+        if d.is_dir() and DATE_RE.match(d.name) and d.name < today
+    )
+    for d in reversed(dated):
+        candidate = d / filename
+        if candidate.exists():
+            return candidate
+    return None
 
 
 def emit_output(**kv: str) -> None:
@@ -202,8 +224,30 @@ async def main() -> int:
 
             if file_changed:
                 any_changed = True
-                (CURRENT_DIR / filename).write_bytes(body)
                 meta["last_changed_utc"] = now_iso
+                today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+                archive_day = ARCHIVE_DIR / today
+                archive_day.mkdir(parents=True, exist_ok=True)
+
+                prior_xlsx = _find_prior_xlsx(filename, today)
+                (archive_day / filename).write_bytes(body)
+                if prior_xlsx is not None and filename.lower().endswith(".xlsx"):
+                    diff_result = xlsx_diff.diff(prior_xlsx, archive_day / filename)
+                    md = xlsx_diff.render_markdown(
+                        diff_result,
+                        old_date=prior_xlsx.parent.name if prior_xlsx.parent.name != "current" else "previous",
+                        new_date=today,
+                    )
+                    (archive_day / "changes.md").write_text(md + "\n")
+                    meta["diff_summary"] = xlsx_diff.summarize_one_liner(diff_result)
+                    print(f"  -> diff: {meta['diff_summary']}", flush=True)
+                elif prior_xlsx is None:
+                    (archive_day / "changes.md").write_text(
+                        f"# Initial snapshot — {today}\n\nFirst recorded version; no prior to diff against.\n"
+                    )
+                    print("  -> initial archive snapshot (no prior to diff)", flush=True)
+
+                (CURRENT_DIR / filename).write_bytes(body)
                 print(
                     f"  -> CHANGED: {len(body):,} bytes  sha={sha[:12]}  "
                     f"source-modified={meta.get('source_last_modified')}  "
@@ -225,12 +269,15 @@ async def main() -> int:
         METADATA_PATH.write_text(json.dumps(metadata, indent=2) + "\n")
 
     primary = files_meta[0] if files_meta else {}
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     emit_output(
         changed="true" if any_changed else "false",
         file_count=str(len(files_meta)),
         filenames=", ".join(m["filename"] for m in files_meta),
         source_last_modified=primary.get("source_last_modified") or "",
         xlsx_modified=primary.get("xlsx_dcterms_modified") or "",
+        diff_summary=primary.get("diff_summary") or "",
+        archive_date=today if any_changed else "",
     )
 
     print(f"[fetch] done. any_changed={any_changed}", flush=True)

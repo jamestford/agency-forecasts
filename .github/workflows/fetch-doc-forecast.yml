@@ -43,21 +43,31 @@ jobs:
           FILES: ${{ steps.fetch.outputs.filenames }}
           SRC_MOD: ${{ steps.fetch.outputs.source_last_modified }}
           XLSX_MOD: ${{ steps.fetch.outputs.xlsx_modified }}
+          DIFF_SUMMARY: ${{ steps.fetch.outputs.diff_summary }}
+          ARCHIVE_DATE: ${{ steps.fetch.outputs.archive_date }}
         run: |
-          if [[ -z "$(git status --porcelain current/)" ]]; then
-            echo "Script reported changed=true but git sees no diff under current/. Skipping commit."
+          if [[ -z "$(git status --porcelain current/ archive/)" ]]; then
+            echo "Script reported changed=true but git sees no diff. Skipping commit."
             exit 0
           fi
           git config user.email "forecast-bot@users.noreply.github.com"
           git config user.name "Forecast Bot"
-          git add current/
+          git add current/ archive/
           {
-            echo "DOC procurement forecast updated"
+            echo "DOC procurement forecast updated — $ARCHIVE_DATE"
             echo
             echo "Source page:        https://www.commerce.gov/oam/industry/procurement-forecasts"
             echo "Files:              $FILES"
             echo "HTTP Last-Modified: ${SRC_MOD:-(none)}"
             echo "XLSX dcterms:mod:   ${XLSX_MOD:-(none)}"
+            if [[ -n "$DIFF_SUMMARY" ]]; then
+              echo "Diff:               $DIFF_SUMMARY"
+              echo
+              echo "See archive/$ARCHIVE_DATE/changes.md for row-level changes."
+            else
+              echo
+              echo "Initial snapshot — no prior version to diff against."
+            fi
           } > /tmp/commit-msg.txt
           git commit -F /tmp/commit-msg.txt
           git push
