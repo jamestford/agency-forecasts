@@ -1,0 +1,67 @@
+name: Fetch DOC Procurement Forecast
+
+on:
+  schedule:
+    - cron: '0 12 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fetch-doc-forecast
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install Playwright + Chromium
+        run: |
+          python -m pip install --upgrade pip
+          pip install playwright==1.49.0
+          playwright install --with-deps chromium
+
+      - id: fetch
+        name: Fetch DOC forecast
+        run: python scripts/fetch_doc_forecast.py
+
+      - name: Commit and push if changed
+        run: |
+          if [[ -z "$(git status --porcelain forecasts/)" ]]; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git config user.email "forecast-bot@users.noreply.github.com"
+          git config user.name "Forecast Bot"
+          git add forecasts/
+          msg_subject="DOC procurement forecast — ${{ steps.fetch.outputs.date }} (${{ steps.fetch.outputs.file_count }} file(s))"
+          {
+            echo "$msg_subject"
+            echo
+            echo "Source: https://www.commerce.gov/oam/industry/procurement-forecasts"
+            echo "Files:  ${{ steps.fetch.outputs.filenames }}"
+            if [[ -f "forecasts/${{ steps.fetch.outputs.date }}/changes.txt" ]]; then
+              echo
+              cat "forecasts/${{ steps.fetch.outputs.date }}/changes.txt"
+            fi
+          } > /tmp/commit-msg.txt
+          git commit -F /tmp/commit-msg.txt
+          git push
+
+      - name: Upload page snapshot on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: page-snapshot
+          path: forecasts/**/page-snapshot*.html
+          if-no-files-found: ignore
+          retention-days: 14
