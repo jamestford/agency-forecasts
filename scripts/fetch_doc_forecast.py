@@ -11,6 +11,7 @@ workflow uses to decide whether to commit.
 from __future__ import annotations
 
 import asyncio
+import base64
 import hashlib
 import json
 import os
@@ -44,6 +45,36 @@ def parse_xlsx_modified(data: bytes) -> str | None:
     except Exception as e:
         print(f"[fetch] (warn) could not parse XLSX modified date: {e}", flush=True)
         return None
+
+
+_FETCH_JS = """
+async (url) => {
+  const r = await fetch(url, {credentials: 'include', redirect: 'follow'});
+  const headers = {};
+  r.headers.forEach((v, k) => headers[k.toLowerCase()] = v);
+  if (!r.ok) {
+    return {error: true, status: r.status, statusText: r.statusText, headers};
+  }
+  const buf = await r.arrayBuffer();
+  const bytes = new Uint8Array(buf);
+  const CHUNK = 0x8000;
+  let binary = '';
+  for (let i = 0; i < bytes.length; i += CHUNK) {
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK));
+  }
+  return {ok: true, base64: btoa(binary), headers, size: bytes.length};
+}
+"""
+
+
+async def fetch_via_browser(page, url: str) -> tuple[bytes, dict]:
+    """Download a URL using the browser's own fetch — inherits TLS fingerprint + cookies."""
+    result = await page.evaluate(_FETCH_JS, url)
+    if result.get("error"):
+        raise RuntimeError(
+            f"Download failed for {url}: HTTP {result['status']} {result.get('statusText','')}"
+        )
+    return base64.b64decode(result["base64"]), result.get("headers", {})
 
 
 def emit_output(**kv: str) -> None:
@@ -134,12 +165,8 @@ async def main() -> int:
         for url in doc_links:
             filename = urllib.parse.unquote(url.rsplit("/", 1)[-1])
             print(f"[fetch] downloading {filename}", flush=True)
-            response = await page.context.request.get(url)
-            if not response.ok:
-                raise RuntimeError(f"Download failed for {url}: HTTP {response.status}")
-            body = await response.body()
+            body, headers = await fetch_via_browser(page, url)
             sha = hashlib.sha256(body).hexdigest()
-            headers = response.headers
 
             old = prior_by_name.get(filename)
             file_changed = old is None or old.get("sha256") != sha
