@@ -23,6 +23,7 @@ from pathlib import Path
 from xml.etree import ElementTree as ET
 
 from playwright.async_api import async_playwright
+from playwright_stealth import stealth_async
 
 PAGE_URL = "https://www.commerce.gov/oam/industry/procurement-forecasts"
 ALLOWED_HOST = "www.commerce.gov"
@@ -71,29 +72,43 @@ async def main() -> int:
     prior_by_name = {f["filename"]: f for f in prior_meta.get("files", [])}
 
     async with async_playwright() as p:
-        browser = await p.chromium.launch(
+        launch_kwargs = dict(
             headless=True,
-            args=["--disable-blink-features=AutomationControlled", "--no-sandbox"],
+            args=[
+                "--disable-blink-features=AutomationControlled",
+                "--no-sandbox",
+                "--disable-features=IsolateOrigins,site-per-process",
+            ],
         )
+        if os.environ.get("USE_SYSTEM_CHROME") == "1":
+            launch_kwargs["channel"] = "chrome"
+        browser = await p.chromium.launch(**launch_kwargs)
         context = await browser.new_context(
             user_agent=UA,
             viewport={"width": 1280, "height": 800},
             locale="en-US",
-        )
-        await context.add_init_script(
-            "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})"
+            timezone_id="America/New_York",
+            extra_http_headers={
+                "Accept-Language": "en-US,en;q=0.9",
+                "Sec-Ch-Ua": '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+                "Sec-Ch-Ua-Mobile": "?0",
+                "Sec-Ch-Ua-Platform": '"macOS"',
+            },
         )
         page = await context.new_page()
+        await stealth_async(page)
 
         print(f"[fetch] GET {PAGE_URL}", flush=True)
-        await page.goto(PAGE_URL, wait_until="domcontentloaded", timeout=60000)
+        await page.goto(PAGE_URL, wait_until="domcontentloaded", timeout=90000)
 
         title = await page.title()
-        for attempt in range(45):
+        max_attempts = 90
+        for attempt in range(max_attempts):
             title = await page.title()
             if "moment" not in title.lower() and "challenge" not in title.lower():
                 break
-            print(f"[fetch] waiting for CF (attempt {attempt+1}, title={title!r})", flush=True)
+            if attempt % 5 == 0:
+                print(f"[fetch] waiting for CF (attempt {attempt+1}/{max_attempts}, title={title!r})", flush=True)
             await asyncio.sleep(2)
         else:
             html = await page.content()
