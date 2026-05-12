@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
-"""Download the DOC procurement forecast(s) using Playwright.
+"""Download the DOC procurement forecast using Playwright, only commit on change.
 
 Plain HTTP fetchers get 403'd by Cloudflare bot challenges on commerce.gov.
 A real browser (headless Chromium) clears the challenge and reuses those
 cookies/TLS fingerprint when fetching each linked document.
+
+Writes the latest file to current/ and emits GitHub Actions outputs the
+workflow uses to decide whether to commit.
 """
 from __future__ import annotations
 
@@ -11,11 +14,13 @@ import asyncio
 import hashlib
 import json
 import os
-import re
 import sys
 import urllib.parse
+import zipfile
 from datetime import datetime, timezone
+from io import BytesIO
 from pathlib import Path
+from xml.etree import ElementTree as ET
 
 from playwright.async_api import async_playwright
 
@@ -25,7 +30,8 @@ DOC_EXTENSIONS = (".xlsx", ".xls", ".pdf", ".doc", ".docx", ".csv")
 FORECAST_KEYWORDS = ("forecast",)
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-FORECASTS_DIR = REPO_ROOT / "forecasts"
+CURRENT_DIR = REPO_ROOT / "current"
+METADATA_PATH = CURRENT_DIR / "metadata.json"
 
 UA = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
@@ -33,10 +39,36 @@ UA = (
 )
 
 
+def parse_xlsx_modified(data: bytes) -> str | None:
+    """Read dcterms:modified out of an XLSX's docProps/core.xml."""
+    try:
+        with zipfile.ZipFile(BytesIO(data)) as zf:
+            with zf.open("docProps/core.xml") as f:
+                root = ET.parse(f).getroot()
+        el = root.find("{http://purl.org/dc/terms/}modified")
+        return el.text if el is not None else None
+    except Exception as e:
+        print(f"[fetch] (warn) could not parse XLSX modified date: {e}", flush=True)
+        return None
+
+
+def emit_output(**kv: str) -> None:
+    path = os.environ.get("GITHUB_OUTPUT")
+    if not path:
+        return
+    with open(path, "a") as f:
+        for k, v in kv.items():
+            f.write(f"{k}={v}\n")
+
+
 async def main() -> int:
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    out_dir = FORECASTS_DIR / today
-    out_dir.mkdir(parents=True, exist_ok=True)
+    CURRENT_DIR.mkdir(parents=True, exist_ok=True)
+    now_iso = datetime.now(timezone.utc).isoformat()
+
+    prior_meta: dict = {}
+    if METADATA_PATH.exists():
+        prior_meta = json.loads(METADATA_PATH.read_text())
+    prior_by_name = {f["filename"]: f for f in prior_meta.get("files", [])}
 
     async with async_playwright() as p:
         browser = await p.chromium.launch(
@@ -61,16 +93,12 @@ async def main() -> int:
             title = await page.title()
             if "moment" not in title.lower() and "challenge" not in title.lower():
                 break
-            print(f"[fetch] waiting for CF challenge to clear (attempt {attempt+1}, title={title!r})", flush=True)
+            print(f"[fetch] waiting for CF (attempt {attempt+1}, title={title!r})", flush=True)
             await asyncio.sleep(2)
         else:
             html = await page.content()
-            snap = out_dir / "page-snapshot-blocked.html"
-            snap.write_text(html)
-            raise RuntimeError(
-                f"CF challenge did not clear; final title={title!r}. "
-                f"Snapshot at {snap.relative_to(REPO_ROOT)}"
-            )
+            (CURRENT_DIR / "_blocked-snapshot.html").write_text(html)
+            raise RuntimeError(f"CF challenge did not clear; final title={title!r}.")
 
         print(f"[fetch] page loaded, title={title!r}", flush=True)
 
@@ -83,10 +111,10 @@ async def main() -> int:
             parsed = urllib.parse.urlparse(href)
             if parsed.netloc != ALLOWED_HOST:
                 continue
-            decoded_path = urllib.parse.unquote(parsed.path).lower()
-            if not decoded_path.endswith(DOC_EXTENSIONS):
+            decoded = urllib.parse.unquote(parsed.path).lower()
+            if not decoded.endswith(DOC_EXTENSIONS):
                 continue
-            if not any(k in decoded_path for k in FORECAST_KEYWORDS):
+            if not any(k in decoded for k in FORECAST_KEYWORDS):
                 continue
             doc_links.append(href)
         doc_links = sorted(set(doc_links))
@@ -97,13 +125,12 @@ async def main() -> int:
 
         if not doc_links:
             html = await page.content()
-            (out_dir / "page-snapshot.html").write_text(html)
-            raise RuntimeError(
-                "No forecast files linked on the page. "
-                f"Snapshot saved to forecasts/{today}/page-snapshot.html"
-            )
+            (CURRENT_DIR / "_no-links-snapshot.html").write_text(html)
+            raise RuntimeError("No forecast files linked on the page.")
 
         files_meta: list[dict] = []
+        any_changed = False
+
         for url in doc_links:
             filename = urllib.parse.unquote(url.rsplit("/", 1)[-1])
             print(f"[fetch] downloading {filename}", flush=True)
@@ -111,61 +138,59 @@ async def main() -> int:
             if not response.ok:
                 raise RuntimeError(f"Download failed for {url}: HTTP {response.status}")
             body = await response.body()
-            (out_dir / filename).write_bytes(body)
             sha = hashlib.sha256(body).hexdigest()
-            files_meta.append({
+            headers = response.headers
+
+            old = prior_by_name.get(filename)
+            file_changed = old is None or old.get("sha256") != sha
+
+            meta = {
                 "filename": filename,
                 "source_url": url,
                 "sha256": sha,
                 "bytes": len(body),
-            })
-            print(f"  -> {len(body):,} bytes, sha256={sha[:12]}...", flush=True)
+                "source_last_modified": headers.get("last-modified"),
+                "source_etag": headers.get("etag"),
+            }
+            if filename.lower().endswith(".xlsx"):
+                meta["xlsx_dcterms_modified"] = parse_xlsx_modified(body)
 
-        metadata = {
-            "source_page_url": PAGE_URL,
-            "fetch_timestamp_utc": datetime.now(timezone.utc).isoformat(),
-            "files": files_meta,
-        }
-        (out_dir / "metadata.json").write_text(json.dumps(metadata, indent=2) + "\n")
+            if file_changed:
+                any_changed = True
+                (CURRENT_DIR / filename).write_bytes(body)
+                meta["last_changed_utc"] = now_iso
+                print(
+                    f"  -> CHANGED: {len(body):,} bytes  sha={sha[:12]}  "
+                    f"source-modified={meta.get('source_last_modified')}  "
+                    f"xlsx-modified={meta.get('xlsx_dcterms_modified')}",
+                    flush=True,
+                )
+            else:
+                meta["last_changed_utc"] = old.get("last_changed_utc")
+                print(f"  -> unchanged (sha matches prior; last changed {meta['last_changed_utc']})", flush=True)
 
-        prior_dirs = sorted(
-            d for d in FORECASTS_DIR.iterdir()
-            if d.is_dir()
-            and d.name != today
-            and re.fullmatch(r"\d{4}-\d{2}-\d{2}", d.name)
-        )
-        change_summary = ""
-        if prior_dirs:
-            prior = prior_dirs[-1]
-            prior_meta_path = prior / "metadata.json"
-            prior_files = {}
-            if prior_meta_path.exists():
-                prior_meta = json.loads(prior_meta_path.read_text())
-                prior_files = {f["filename"]: f for f in prior_meta.get("files", [])}
-            lines = [f"Comparison vs forecasts/{prior.name}:"]
-            for f in files_meta:
-                old = prior_files.get(f["filename"])
-                if old is None:
-                    lines.append(f"  NEW     {f['filename']} ({f['bytes']:,} bytes)")
-                elif old["sha256"] != f["sha256"]:
-                    lines.append(
-                        f"  CHANGED {f['filename']} "
-                        f"({old['bytes']:,} -> {f['bytes']:,} bytes)"
-                    )
-                else:
-                    lines.append(f"  same    {f['filename']} ({f['bytes']:,} bytes)")
-            change_summary = "\n".join(lines)
-            (out_dir / "changes.txt").write_text(change_summary + "\n")
-            print(f"[fetch] {change_summary}", flush=True)
+            files_meta.append(meta)
 
         await browser.close()
 
-    if "GITHUB_OUTPUT" in os.environ:
-        with open(os.environ["GITHUB_OUTPUT"], "a") as f:
-            f.write(f"date={today}\n")
-            f.write(f"file_count={len(files_meta)}\n")
-            f.write(f"filenames={', '.join(m['filename'] for m in files_meta)}\n")
+    if any_changed:
+        metadata = {
+            "source_page_url": PAGE_URL,
+            "last_checked_utc": now_iso,
+            "files": files_meta,
+        }
+        METADATA_PATH.write_text(json.dumps(metadata, indent=2) + "\n")
 
+    primary = files_meta[0] if files_meta else {}
+    emit_output(
+        changed="true" if any_changed else "false",
+        file_count=str(len(files_meta)),
+        filenames=", ".join(m["filename"] for m in files_meta),
+        source_last_modified=primary.get("source_last_modified") or "",
+        xlsx_modified=primary.get("xlsx_dcterms_modified") or "",
+    )
+
+    print(f"[fetch] done. any_changed={any_changed}", flush=True)
     return 0
 
 

@@ -23,11 +23,12 @@ jobs:
         with:
           python-version: '3.12'
           cache: pip
+          cache-dependency-path: requirements.txt
 
-      - name: Install Playwright + Chromium
+      - name: Install Python deps + Chromium
         run: |
           python -m pip install --upgrade pip
-          pip install playwright==1.49.0
+          pip install -r requirements.txt
           playwright install --with-deps chromium
 
       - id: fetch
@@ -35,33 +36,42 @@ jobs:
         run: python scripts/fetch_doc_forecast.py
 
       - name: Commit and push if changed
+        if: steps.fetch.outputs.changed == 'true'
+        env:
+          FILES: ${{ steps.fetch.outputs.filenames }}
+          SRC_MOD: ${{ steps.fetch.outputs.source_last_modified }}
+          XLSX_MOD: ${{ steps.fetch.outputs.xlsx_modified }}
         run: |
-          if [[ -z "$(git status --porcelain forecasts/)" ]]; then
-            echo "No changes to commit."
+          if [[ -z "$(git status --porcelain current/)" ]]; then
+            echo "Script reported changed=true but git sees no diff under current/. Skipping commit."
             exit 0
           fi
           git config user.email "forecast-bot@users.noreply.github.com"
           git config user.name "Forecast Bot"
-          git add forecasts/
-          msg_subject="DOC procurement forecast — ${{ steps.fetch.outputs.date }} (${{ steps.fetch.outputs.file_count }} file(s))"
+          git add current/
           {
-            echo "$msg_subject"
+            echo "DOC procurement forecast updated"
             echo
-            echo "Source: https://www.commerce.gov/oam/industry/procurement-forecasts"
-            echo "Files:  ${{ steps.fetch.outputs.filenames }}"
-            if [[ -f "forecasts/${{ steps.fetch.outputs.date }}/changes.txt" ]]; then
-              echo
-              cat "forecasts/${{ steps.fetch.outputs.date }}/changes.txt"
-            fi
+            echo "Source page:        https://www.commerce.gov/oam/industry/procurement-forecasts"
+            echo "Files:              $FILES"
+            echo "HTTP Last-Modified: ${SRC_MOD:-(none)}"
+            echo "XLSX dcterms:mod:   ${XLSX_MOD:-(none)}"
           } > /tmp/commit-msg.txt
           git commit -F /tmp/commit-msg.txt
           git push
+
+      - name: No-change summary
+        if: steps.fetch.outputs.changed == 'false'
+        run: |
+          echo "No content change detected. Files: ${{ steps.fetch.outputs.filenames }}"
+          echo "Source HTTP Last-Modified: ${{ steps.fetch.outputs.source_last_modified }}"
+          echo "XLSX dcterms:modified:     ${{ steps.fetch.outputs.xlsx_modified }}"
 
       - name: Upload page snapshot on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: page-snapshot
-          path: forecasts/**/page-snapshot*.html
+          path: current/_*snapshot*.html
           if-no-files-found: ignore
           retention-days: 14
