@@ -1,0 +1,16 @@
+{
+  "source_page_url": "https://www.commerce.gov/oam/industry/procurement-forecasts",
+  "last_checked_utc": "2026-05-12T19:34:45.876573+00:00",
+  "files": [
+    {
+      "filename": "DOC Weekly Forecast Report.xlsx",
+      "source_url": "https://www.commerce.gov/sites/default/files/2022-12/DOC%20Weekly%20Forecast%20Report.xlsx",
+      "sha256": "1edd3f0665fc86ea694114ddaac8ee9903de7e23aeb46a0798c34dd2b1a1de74",
+      "bytes": 848964,
+      "source_last_modified": "Mon, 11 May 2026 15:31:43 GMT",
+      "source_etag": "\"6a01f65f-cf444\"",
+      "xlsx_dcterms_modified": "2026-05-11T15:29:43Z",
+      "last_changed_utc": "2026-05-12T19:34:45.876573+00:00"
+    }
+  ]
+}
