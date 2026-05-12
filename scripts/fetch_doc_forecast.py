@@ -49,20 +49,31 @@ def parse_xlsx_modified(data: bytes) -> str | None:
 
 _FETCH_JS = """
 async (url) => {
-  const r = await fetch(url, {credentials: 'include', redirect: 'follow'});
-  const headers = {};
-  r.headers.forEach((v, k) => headers[k.toLowerCase()] = v);
-  if (!r.ok) {
-    return {error: true, status: r.status, statusText: r.statusText, headers};
+  try {
+    const r = await fetch(url, {credentials: 'include', redirect: 'follow'});
+    const lastModified = r.headers.get('last-modified');
+    const etag = r.headers.get('etag');
+    const contentType = r.headers.get('content-type');
+    if (!r.ok) {
+      return {error: true, status: r.status, statusText: r.statusText,
+              lastModified, etag, contentType};
+    }
+    const blob = await r.blob();
+    const base64 = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = String(reader.result);
+        const comma = result.indexOf(',');
+        resolve(comma >= 0 ? result.slice(comma + 1) : result);
+      };
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(blob);
+    });
+    return {ok: true, base64, size: blob.size,
+            lastModified, etag, contentType};
+  } catch (e) {
+    return {error: true, message: String(e && e.message ? e.message : e)};
   }
-  const buf = await r.arrayBuffer();
-  const bytes = new Uint8Array(buf);
-  const CHUNK = 0x8000;
-  let binary = '';
-  for (let i = 0; i < bytes.length; i += CHUNK) {
-    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK));
-  }
-  return {ok: true, base64: btoa(binary), headers, size: bytes.length};
 }
 """
 
@@ -71,10 +82,17 @@ async def fetch_via_browser(page, url: str) -> tuple[bytes, dict]:
     """Download a URL using the browser's own fetch — inherits TLS fingerprint + cookies."""
     result = await page.evaluate(_FETCH_JS, url)
     if result.get("error"):
-        raise RuntimeError(
-            f"Download failed for {url}: HTTP {result['status']} {result.get('statusText','')}"
+        detail = (
+            f"HTTP {result['status']} {result.get('statusText','')}"
+            if "status" in result else f"exception: {result.get('message','?')}"
         )
-    return base64.b64decode(result["base64"]), result.get("headers", {})
+        raise RuntimeError(f"Download failed for {url}: {detail}")
+    headers = {
+        "last-modified": result.get("lastModified"),
+        "etag": result.get("etag"),
+        "content-type": result.get("contentType"),
+    }
+    return base64.b64decode(result["base64"]), headers
 
 
 def emit_output(**kv: str) -> None:
