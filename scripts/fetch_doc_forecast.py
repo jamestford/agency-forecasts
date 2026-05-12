@@ -35,9 +35,10 @@ ALLOWED_HOST = "www.commerce.gov"
 DOC_EXTENSIONS = (".xlsx", ".xls", ".pdf", ".doc", ".docx", ".csv")
 FORECAST_KEYWORDS = ("forecast",)
 
+AGENCY = "doc"
 REPO_ROOT = Path(__file__).resolve().parent.parent
-CURRENT_DIR = REPO_ROOT / "current"
-ARCHIVE_DIR = REPO_ROOT / "archive"
+CURRENT_DIR = REPO_ROOT / "current" / AGENCY
+ARCHIVE_DIR = REPO_ROOT / "archive" / AGENCY
 METADATA_PATH = CURRENT_DIR / "metadata.json"
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 

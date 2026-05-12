@@ -1,4 +1,4 @@
-name: Fetch DOC Procurement Forecast
+name: Fetch ED Procurement Forecast
 
 on:
   schedule:
@@ -9,13 +9,13 @@ permissions:
   contents: write
 
 concurrency:
-  group: fetch-doc-forecast
+  group: fetch-ed-forecast
   cancel-in-progress: false
 
 jobs:
   fetch:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
 
@@ -28,42 +28,37 @@ jobs:
       - name: Install Python deps
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Fetch Camoufox browser binary + GeoIP DB
-        run: python -m camoufox fetch
+          pip install requests pdfplumber
 
       - id: fetch
-        name: Fetch DOC forecast
-        run: python scripts/fetch_doc_forecast.py
+        name: Fetch ED forecast
+        run: python scripts/fetch_ed_forecast.py
 
       - name: Commit and push if changed
         if: steps.fetch.outputs.changed == 'true'
         env:
-          FILES: ${{ steps.fetch.outputs.filenames }}
+          FILE: ${{ steps.fetch.outputs.filenames }}
           SRC_MOD: ${{ steps.fetch.outputs.source_last_modified }}
-          XLSX_MOD: ${{ steps.fetch.outputs.xlsx_modified }}
           DIFF_SUMMARY: ${{ steps.fetch.outputs.diff_summary }}
           ARCHIVE_DATE: ${{ steps.fetch.outputs.archive_date }}
         run: |
-          if [[ -z "$(git status --porcelain current/doc archive/doc)" ]]; then
+          if [[ -z "$(git status --porcelain current/ed archive/ed)" ]]; then
             echo "Script reported changed=true but git sees no diff. Skipping commit."
             exit 0
           fi
           git config user.email "forecast-bot@users.noreply.github.com"
           git config user.name "Forecast Bot"
-          git add current/doc archive/doc
+          git add current/ed archive/ed
           {
-            echo "DOC procurement forecast updated — $ARCHIVE_DATE"
+            echo "ED procurement forecast updated — $ARCHIVE_DATE"
             echo
-            echo "Source page:        https://www.commerce.gov/oam/industry/procurement-forecasts"
-            echo "Files:              $FILES"
+            echo "Source page:        https://www.ed.gov/about/doing-business-ed/forecast-of-ed-contract-opportunities"
+            echo "File:               $FILE"
             echo "HTTP Last-Modified: ${SRC_MOD:-(none)}"
-            echo "XLSX dcterms:mod:   ${XLSX_MOD:-(none)}"
             if [[ -n "$DIFF_SUMMARY" ]]; then
               echo "Diff:               $DIFF_SUMMARY"
               echo
-              echo "See archive/doc/$ARCHIVE_DATE/changes.md for row-level changes."
+              echo "See archive/ed/$ARCHIVE_DATE/changes.md for row-level changes."
             else
               echo
               echo "Initial snapshot — no prior version to diff against."
@@ -75,15 +70,14 @@ jobs:
       - name: No-change summary
         if: steps.fetch.outputs.changed == 'false'
         run: |
-          echo "No content change detected. Files: ${{ steps.fetch.outputs.filenames }}"
+          echo "No content change detected. File: ${{ steps.fetch.outputs.filenames }}"
           echo "Source HTTP Last-Modified: ${{ steps.fetch.outputs.source_last_modified }}"
-          echo "XLSX dcterms:modified:     ${{ steps.fetch.outputs.xlsx_modified }}"
 
       - name: Upload page snapshot on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: page-snapshot
-          path: current/doc/_*snapshot*.html
+          name: ed-page-snapshot
+          path: current/ed/_*snapshot*.html
           if-no-files-found: ignore
           retention-days: 14
