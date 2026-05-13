@@ -103,6 +103,7 @@ def process_download(
     body: bytes,
     headers: dict,
     extension: str,
+    filename: str | None = None,
     extra_meta: dict | None = None,
     parse_rows: Callable[[Path], "tuple[dict, list[str]]"] | None = None,
     title_column: str | None = None,
@@ -112,6 +113,8 @@ def process_download(
     """Common path: archive on change, diff vs prior, write current + metadata.
 
     `parse_rows(path)` must return `(rows_dict, columns_list)`.
+    `filename` overrides URL-tail extraction (use when the URL doesn't end
+    in a real filename, e.g. justice.gov/media/<id>/dl).
     Returns (changed: bool, meta_for_outputs: dict, diff_summary: str).
     """
     import diff_lib
@@ -122,8 +125,9 @@ def process_download(
     current_dir, archive_dir, meta_path = agency_paths(agency)
     current_dir.mkdir(parents=True, exist_ok=True)
 
-    import urllib.parse as _u
-    filename = _u.unquote(file_url.rsplit("/", 1)[-1])
+    if not filename:
+        import urllib.parse as _u
+        filename = _u.unquote(file_url.rsplit("/", 1)[-1])
 
     sha = hashlib.sha256(body).hexdigest()
     prior_meta: dict = {}
