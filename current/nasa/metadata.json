@@ -1,0 +1,15 @@
+{
+  "source_page_url": "https://www.hq.nasa.gov/office/procurement/forecast/NAF.html",
+  "last_checked_utc": "2026-05-13T21:48:44.272327+00:00",
+  "files": [
+    {
+      "filename": "AcqForecastNew.xlsx",
+      "source_url": "https://www.hq.nasa.gov/office/procurement/forecast/AcqForecastNew.xlsx",
+      "sha256": "dac66a1dc48eb86854f34a337aa3cbdbafd85c530d419696aefd2341195f1ca6",
+      "bytes": 93623,
+      "source_last_modified": "Tue, 31 Mar 2026 19:35:10 GMT",
+      "source_etag": "\"3a12ceacd8332958a09ec4a33ed509e1\"",
+      "last_changed_utc": "2026-05-13T21:48:44.272327+00:00"
+    }
+  ]
+}

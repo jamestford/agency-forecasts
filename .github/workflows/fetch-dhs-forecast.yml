@@ -1,0 +1,70 @@
+name: Fetch DHS APFS Procurement Forecast
+
+on:
+  schedule:
+    - cron: '0 12 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fetch-dhs-forecast
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python deps
+        run: pip install requests
+
+      - id: fetch
+        name: Fetch DHS APFS forecast
+        run: python scripts/fetch_dhs_forecast.py
+
+      - name: Commit and push if changed
+        if: steps.fetch.outputs.changed == 'true'
+        env:
+          FILE: ${{ steps.fetch.outputs.filenames }}
+          SRC_MOD: ${{ steps.fetch.outputs.source_last_modified }}
+          DIFF_SUMMARY: ${{ steps.fetch.outputs.diff_summary }}
+          ARCHIVE_DATE: ${{ steps.fetch.outputs.archive_date }}
+          RECORD_COUNT: ${{ steps.fetch.outputs.record_count }}
+        run: |
+          if [[ -z "$(git status --porcelain current/dhs archive/dhs)" ]]; then
+            echo "Script reported changed=true but git sees no diff. Skipping."
+            exit 0
+          fi
+          git config user.email "forecast-bot@users.noreply.github.com"
+          git config user.name "Forecast Bot"
+          git add current/dhs archive/dhs
+          {
+            echo "DHS APFS procurement forecast updated — $ARCHIVE_DATE"
+            echo
+            echo "Source page:        https://apfs-cloud.dhs.gov/forecast/"
+            echo "File:               $FILE"
+            if [[ -n "$RECORD_COUNT" ]]; then echo "Records:            $RECORD_COUNT"; fi
+            if [[ -n "$SRC_MOD" ]]; then echo "HTTP Last-Modified: $SRC_MOD"; fi
+            if [[ -n "$DIFF_SUMMARY" ]]; then
+              echo "Diff:               $DIFF_SUMMARY"
+              echo
+              echo "See archive/dhs/$ARCHIVE_DATE/changes.md for row-level changes."
+            else
+              echo
+              echo "Initial snapshot — no prior version to diff against."
+            fi
+          } > /tmp/commit-msg.txt
+          git commit -F /tmp/commit-msg.txt
+          git push
+
+      - name: No-change summary
+        if: steps.fetch.outputs.changed == 'false'
+        run: echo "No content change. File ${{ steps.fetch.outputs.filenames }}"
