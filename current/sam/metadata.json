@@ -3,15 +3,15 @@
   "source_page_url": "https://sam.gov/opportunities",
   "filter": "ptype=p,r,s (Presolicitation + Sources Sought + Special Notice), active=true",
   "window_days": 90,
-  "last_checked_utc": "2026-05-13T19:44:28.633815+00:00",
+  "last_checked_utc": "2026-05-13T19:45:50.384660+00:00",
   "files": [
     {
       "filename": "opportunities.json",
-      "content_sha256": "774b5258941a58ce7b90b1e07e3ef7285a8e77e966dfbf2a1c383683d28b8f6a",
-      "bytes": 7903974,
-      "count": 7721,
-      "diff_summary": "+46 added, -10 removed, ~0 modified, =7675 unchanged (7685\u21927721 rows)",
-      "last_changed_utc": "2026-05-13T19:44:28.633815+00:00"
+      "content_sha256": "8ef5de5377fd6bab4137a363ab0f20ba32f618d12c67a605b73596b8d385c060",
+      "bytes": 7909242,
+      "count": 7726,
+      "diff_summary": "+7 added, -2 removed, ~0 modified, =7719 unchanged (7721\u21927726 rows)",
+      "last_changed_utc": "2026-05-13T19:45:50.384660+00:00"
     }
   ]
 }
