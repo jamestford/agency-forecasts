@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Fetch active forecast-stage opportunities from SAM.gov public API.
+"""Fetch active Presolicitation opportunities from SAM.gov public API.
 
-Forecast-stage notice types we pull (ptype):
-  p = Presolicitation
-  r = Sources Sought
-  s = Special Notice
+We track Presolicitation only (ptype=p) — the "a solicitation is
+coming" announcement that's most actionable for forecast tracking.
+Excluded: Sources Sought (r, market research) and Special Notice
+(s, mixed bag including sole-source intents and informational).
 
 We paginate over a rolling 90-day posted-date window with active=true.
 Each opportunity is stored as a stripped record (~400 bytes) — enough for
@@ -31,7 +31,7 @@ import diff_lib
 
 AGENCY = "sam"
 API_URL = "https://api.sam.gov/opportunities/v2/search"
-PTYPE = "p,r,s"
+PTYPE = "p"  # Presolicitation only — see module docstring
 WINDOW_DAYS = 90
 PAGE_LIMIT = 1000
 
@@ -157,7 +157,7 @@ def main() -> int:
     ).hexdigest()
     payload = {
         "source": "SAM.gov Opportunities API v2",
-        "filter": "ptype=p,r,s (Presolicitation + Sources Sought + Special Notice), active=true",
+        "filter": "ptype=p (Presolicitation only), active=true",
         "window_days": WINDOW_DAYS,
         "fetched_utc": now_iso,
         "content_sha256": content_sha,
@@ -228,7 +228,7 @@ def main() -> int:
             {
                 "source": "SAM.gov Opportunities API v2",
                 "source_page_url": "https://sam.gov/opportunities",
-                "filter": "ptype=p,r,s (Presolicitation + Sources Sought + Special Notice), active=true",
+                "filter": "ptype=p (Presolicitation only), active=true",
                 "window_days": WINDOW_DAYS,
                 "last_checked_utc": now_iso,
                 "files": [

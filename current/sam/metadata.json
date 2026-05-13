@@ -1,17 +1,17 @@
 {
   "source": "SAM.gov Opportunities API v2",
   "source_page_url": "https://sam.gov/opportunities",
-  "filter": "ptype=p,r,s (Presolicitation + Sources Sought + Special Notice), active=true",
+  "filter": "ptype=p (Presolicitation only), active=true",
   "window_days": 90,
-  "last_checked_utc": "2026-05-13T19:45:50.384660+00:00",
+  "last_checked_utc": "2026-05-13T19:54:07.393830+00:00",
   "files": [
     {
       "filename": "opportunities.json",
-      "content_sha256": "8ef5de5377fd6bab4137a363ab0f20ba32f618d12c67a605b73596b8d385c060",
-      "bytes": 7909242,
-      "count": 7726,
-      "diff_summary": "+7 added, -2 removed, ~0 modified, =7719 unchanged (7721\u21927726 rows)",
-      "last_changed_utc": "2026-05-13T19:45:50.384660+00:00"
+      "content_sha256": "3d8de500675980299c691c7b3c55fd2c0bef1411709425c0c29793fec0b79a57",
+      "bytes": 3109632,
+      "count": 2986,
+      "diff_summary": "+0 added, -4740 removed, ~0 modified, =2986 unchanged (7726\u21922986 rows)",
+      "last_changed_utc": "2026-05-13T19:54:07.393830+00:00"
     }
   ]
 }

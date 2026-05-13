@@ -50,7 +50,7 @@ jobs:
             echo "SAM.gov forecast-stage opportunities updated — $ARCHIVE_DATE"
             echo
             echo "Source:        SAM.gov Opportunities API v2"
-            echo "Filter:        ptype=p,r,s (Presolicitation + Sources Sought + Special Notice), active=true"
+            echo "Filter:        ptype=p (Presolicitation only), active=true"
             echo "Records:       $RECORD_COUNT"
             if [[ -n "$DIFF_SUMMARY" ]]; then
               echo "Diff:          $DIFF_SUMMARY"
