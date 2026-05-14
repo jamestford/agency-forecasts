@@ -1,0 +1,15 @@
+{
+  "source_page_url": "https://osdbu.forecast.treasury.gov/",
+  "source": "Treasury OSDBU Dynamic Forecast (Salesforce Lightning)",
+  "last_checked_utc": "2026-05-14T02:02:01.191095+00:00",
+  "files": [
+    {
+      "filename": "Opportunity Data.xls",
+      "content_sha256": "4365e5925e6d42e541ccb4eae39577c2ccadbf810e0e8e2968edccad3d29e9f3",
+      "bytes": 183334,
+      "count": 202,
+      "diff_summary": "+202 added, -0 removed, ~0 modified, =0 unchanged (0\u2192202 rows)",
+      "last_changed_utc": "2026-05-14T02:02:01.191095+00:00"
+    }
+  ]
+}
