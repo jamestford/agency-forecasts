@@ -39,12 +39,16 @@ jobs:
 
       - name: Fetch Camoufox browser binary + GeoIP DB (if not cached)
         if: steps.camoufox-cache.outputs.cache-hit != 'true'
-        env:
-          # Authenticated GitHub API has 5,000 req/hour vs 60/hour
-          # unauthenticated — avoids rate-limit failures when DOC + Treasury
-          # workflows fire at the same minute.
-          GH_TOKEN: ${{ github.token }}
-        run: python -m camoufox fetch
+        run: |
+          # Retry up to 5 times with 60s backoff on transient failures
+          # (GitHub API rate limit hits when DOC + Treasury fire concurrently).
+          for attempt in 1 2 3 4 5; do
+            if python -m camoufox fetch; then
+              break
+            fi
+            echo "::warning::camoufox fetch attempt $attempt failed; sleeping 60s"
+            if [ $attempt -lt 5 ]; then sleep 60; else exit 1; fi
+          done
 
       - id: fetch
         name: Fetch DOC forecast
