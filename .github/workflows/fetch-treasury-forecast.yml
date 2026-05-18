@@ -30,7 +30,20 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Fetch Camoufox browser binary + GeoIP DB
+      - name: Restore Camoufox binary from cache
+        id: camoufox-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/camoufox
+          key: camoufox-${{ runner.os }}-v1
+
+      - name: Fetch Camoufox browser binary + GeoIP DB (if not cached)
+        if: steps.camoufox-cache.outputs.cache-hit != 'true'
+        env:
+          # Authenticated GitHub API has 5,000 req/hour vs 60/hour
+          # unauthenticated — avoids rate-limit failures when DOC + Treasury
+          # workflows fire at the same minute.
+          GH_TOKEN: ${{ github.token }}
         run: python -m camoufox fetch
 
       - id: fetch
