@@ -3,15 +3,15 @@
   "source_page_url": "https://sam.gov/opportunities",
   "filter": "ptype=p (Presolicitation only), active=true",
   "window_days": 90,
-  "last_checked_utc": "2026-06-22T13:51:40.989926+00:00",
+  "last_checked_utc": "2026-06-29T13:26:25.188064+00:00",
   "files": [
     {
       "filename": "opportunities.json",
-      "content_sha256": "5fa960372669a7f920c0bc993456b449d065436db0b49fb3addb397228977d9b",
-      "bytes": 2790363,
-      "count": 2683,
-      "diff_summary": "+857 added, -1000 removed, ~0 modified, =1826 unchanged (2826\u21922683 rows)",
-      "last_changed_utc": "2026-06-22T13:51:40.989926+00:00"
+      "content_sha256": "d79d8b6dd38d00220c96173e7e8910f790de7e8f03445644e605ebf45cef7a76",
+      "bytes": 2743241,
+      "count": 2638,
+      "diff_summary": "+460 added, -505 removed, ~0 modified, =2178 unchanged (2683\u21922638 rows)",
+      "last_changed_utc": "2026-06-29T13:26:25.188064+00:00"
     }
   ]
 }

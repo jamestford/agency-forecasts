@@ -1,0 +1,74 @@
+# Changes — 2026-06-29
+
+Compared against snapshot from `2026-06-22`.
+
+- **Added:** 460 row(s)
+- **Removed:** 505 row(s)
+- **Modified:** 0 row(s)
+- **Unchanged:** 2178 row(s)
+- Total rows: 2683 → 2638
+
+## Added
+
+| Key | title | type | fullParentPathName | postedDate | responseDeadLine | typeOfSetAsideDescription |
+|---|---|---|---|---|---|---|
+| 00f1d0cdda32486fac6910fd8aee7a6c | Z1DA--556-24-113  Oil Transformer and Switch Enclosure Upgrades | Presolicitation | VETERANS AFFAIRS, DEPARTMENT OF.VETERANS AFFAIRS, DEPARTMENT OF.252-NETWORK CONTRACT OFFICE 12 (36C252) | 2026-06-24 | 2026-08-04T10:00:00-05:00 | Service-Disabled Veteran-Owned Small Business Set Aside |
+| 015204d386894cf5ab6e6c70ef56795e | Z1DZ--Door Maintenance, Repair IDC | Presolicitation | VETERANS AFFAIRS, DEPARTMENT OF.VETERANS AFFAIRS, DEPARTMENT OF.246-NETWORK CONTRACTING OFFICE 6 (36C246) | 2026-06-23 | 2026-06-23T17:00:00-04:00 | Service-Disabled Veteran-Owned Small Business Set Aside |
+| 019af00b51a54701aa2793f23cee8317 | B6030 A_C Roof Replacement | Presolicitation | DEPT OF DEFENSE.DEPT OF THE AIR FORCE.AIR FORCE GLOBAL STRIKE COMMAND.FA4661  7 CONS CD | 2026-06-25 | 2026-07-10T16:00:00-05:00 | Total Small Business Set-Aside (FAR 19.5) |
+| 021e61bafd42441aa29f5a2fb428054e | N6523626QE262 | Presolicitation | DEPT OF DEFENSE.DEPT OF THE NAVY.SPAWAR.SPAWAR LANT.NIWC ATLANTIC | 2026-06-26 | 2026-07-17T15:00:00-05:00 |  |
+| 021fd71724a24d86a812d8f0f584bcc6 | Hyperworks Renewals | Presolicitation | DEPT OF DEFENSE.DEPT OF THE NAVY.NAVSEA.NAVSEA WARFARE CENTER.NSWC CARDEROCK | 2026-06-25 | 2026-07-02T10:00:00-04:00 |  |
+| 02d85a55e54d46a09a2477fa41562277 | FCC HAZELTON, FY27 SFF TAXI SERVICES FOR FEMALE ADULTS IN CUSTODY | Presolicitation | JUSTICE, DEPARTMENT OF.FEDERAL PRISON SYSTEM / BUREAU OF PRISONS.USP HAZELTON | 2026-06-29 | 2026-07-06T08:00:00-04:00 | Total Small Business Set-Aside (FAR 19.5) |
+| 02f81662d5f64074896962f47a3114a1 | 6515--2237 740-VCB-PROSTHETICS-FIRST NATION-S-QUO1054 | Presolicitation | VETERANS AFFAIRS, DEPARTMENT OF.VETERANS AFFAIRS, DEPARTMENT OF.257-NETWORK CONTRACT OFFICE 17 (36C257) | 2026-06-22 | 2026-06-29T13:00:00-05:00 | Service-Disabled Veteran-Owned Small Business Set Aside |
+| 04ab09eccf9149f182b74f22972ffaf3 | Provision of vehicle for Embassy Buenos Aires | Presolicitation | STATE, DEPARTMENT OF.STATE, DEPARTMENT OF.US EMBASSY BUENOS AIRES | 2026-06-23 | 2026-07-27T12:30:00-03:00 |  |
+| 04be63f4f1634dec84f01ee7ed56c56f | Flexcon dividers | Presolicitation | DEPT OF DEFENSE.DEPT OF THE NAVY.NAVSUP.NAVSUP GLOBAL LOGISTICS SUPPORT.NAVSUP FLC NORFOLK.NAVSUP FLT LOG CTR NORFOLK | 2026-06-26 | 2026-06-29T16:00:00-04:00 | No Set aside used |
+| 050bda5078094d759e8722e30c94d44c | Vision-Guided Robotic Automation and Digital Twin Framework for Autonomous Experiments | Presolicitation | ENERGY, DEPARTMENT OF.ENERGY, DEPARTMENT OF.BROOKHAVEN NATL LAB -DOE CONTRACTOR | 2026-06-26 | 2026-07-13T17:00:00-04:00 | No Set aside used |
+| 0533f38a2d2c45539211973699c24a67 | Construct Air Traffic Control (ATC) Tower | Presolicitation | DEPT OF DEFENSE.DEPT OF THE ARMY.US ARMY CORPS OF ENGINEERS.ENGINEER DIVISION NORTHWESTERN.ENDIST KANSAS CITY.W071 ENDIST KANSAS CITY | 2026-06-24 |  |  |
+| 07425092b6954f7b9dbc68ab0c1714cc | 58--RELAY MODULE ASSY, IN REPAIR/MODIFICATION OF | Presolicitation | DEPT OF DEFENSE.DEPT OF THE NAVY.NAVSUP.NAVSUP WEAPON SYSTEMS SUPPORT.NAVSUP WSS MECHANICSBURG.NAVSUP WEAPON SYSTEMS SUPPORT MECH | 2026-06-23 | 2026-08-07T00:00:00-04:00 | Total Small Business Set-Aside (FAR 19.5) |
+| 08302724a5074842a3a53f8ad2c469d5 | Z2DA--657A5-21-401, Construct New Campus Chiller Plant, MRN | Presolicitation | VETERANS AFFAIRS, DEPARTMENT OF.VETERANS AFFAIRS, DEPARTMENT OF.255-NETWORK CONTRACT OFFICE 15 (36C255) | 2026-06-23 | 2026-08-17T12:00:00-05:00 | Service-Disabled Veteran-Owned Small Business Set Aside |
+| 08c5c2fb2ba7408eb0e5bb0ef77e3458 | USNS OSCAR V. PETERSON PTO/PTI Parts | Presolicitation | DEPT OF DEFENSE.DEPT OF THE NAVY.MSC.MSC HQS.MSCHQ NORFOLK | 2026-06-25 |  |  |
+| 093abf93bf3244bc9c6773e548c55ba6 | Notice of Intent to Sole Source for NNSY Preventative Maintenance and Calibration of Party Count Analyzer | Presolicitation | DEPT OF DEFENSE.DEPT OF THE NAVY.NAVSEA.NAVSEA SHIPYARD.NORFOLK NAVAL SHIPYARD GF | 2026-06-24 | 2026-06-22T12:00:00-04:00 | No Set aside used |
+| 096bb201795640058b79862f17420e73 | Infinium Global Diversity Array Kits. | Presolicitation | HEALTH AND HUMAN SERVICES, DEPARTMENT OF.NATIONAL INSTITUTES OF HEALTH.NATIONAL INSTITUTES OF HEALTH OLAO | 2026-06-22 | 2026-07-02T09:00:00-04:00 | No Set aside used |
+| 0983101e35b949d2ac3f471f918137ca | UV Printer | Presolicitation | DEPT OF DEFENSE.DEPT OF THE NAVY.NAVAIR.NAVAIR NAWC WD.NAVAL AIR WARFARE CENTER | 2026-06-26 | 2026-07-06T12:00:00-07:00 |  |
+| 09adb2adec074d9993c5d785bd7a3bec | NAPLES CHILLER REPLACEMENT | Presolicitation | STATE, DEPARTMENT OF.STATE, DEPARTMENT OF.US EMBASSY ROME | 2026-06-24 |  | No Set aside used |
+| 09de3edc3b67491f9c8bcad9fddba25b | Notice of Intent to Award Sole Source - Moulage Kit & Cammies | Presolicitation | DEPT OF DEFENSE.US SPECIAL OPERATIONS COMMAND (USSOCOM).MARSOC H92257 | 2026-06-25 | 2026-06-29T08:00:00-04:00 | No Set aside used |
+| 0ab71feaa064431bb929a8f655f59ae5 | Notice of Proposed Contract Action/Notice of Intent to Sole Source - Mobile On-Site Demilitarization and/or DestructionServices | Presolicitation | DEPT OF DEFENSE.DEPT OF THE AIR FORCE.AIR FORCE MATERIEL COMMAND.AIR FORCE LIFE CYCLE MANAGEMENT CENTER.CYBER AND NETWORKS.FA8307  AFLCMC HNCK HNC CYBER & NTR | 2026-06-22 | 2026-06-29T16:00:00-05:00 | Total Small Business Set-Aside (FAR 19.5) |
+| 0be4a5e590cc4cad862e84db5451e057 | Government Seeks Warehouse Space in Jamaica, NY | Presolicitation | GENERAL SERVICES ADMINISTRATION.PUBLIC BUILDINGS SERVICE.PBS OFFICE OF LEASING | 2026-06-23 | 2026-07-02T17:00:00-04:00 |  |
+| 0cbfdb1dabbb43b480bd0398749c829a | 48--VALVE ASSEMBLY,MANI | Presolicitation | DEPT OF DEFENSE.DEPT OF THE NAVY.NAVSUP.NAVSUP WEAPON SYSTEMS SUPPORT.NAVSUP WSS MECHANICSBURG.NAVSUP WEAPON SYSTEMS SUPPORT MECH | 2026-06-24 | 2026-07-10T16:30:00-04:00 |  |
+| 0d48d6ac7fe1473bb1c73a64da12aee8 | 15--WING ASSEMBLY,AIRCR- AND SIMILAR REPLACEMENT PARTS | Presolicitation | DEPT OF DEFENSE.DEPT OF THE NAVY.NAVSUP.NAVSUP WEAPON SYSTEMS SUPPORT.NAVSUP WSS PHILADELPHIA.NAVSUP WEAPON SYSTEMS SUPPORT | 2026-06-24 | 2026-07-09T00:00:00-04:00 |  |
+| 0dceed830422425cb6193ac85e484157 | RFI - Electromagnetic Compatibility (EMC) / Electromagnetic Interference (EMI) Environmental Qualification Testing (EQT) Support | Presolicitation | DEPT OF DEFENSE.DEPT OF THE NAVY.NAVSEA.NAVSEA WARFARE CENTER.NSWC PHILADELPHIA DIV | 2026-06-24 | 2026-07-09T16:00:00-04:00 |  |
+| 0e50c1242af748dbaba44879ef91ec86 | Yellow Ribbon Event Services in the Fredericksburg VA area | Presolicitation | DEPT OF DEFENSE.DEPT OF THE ARMY.NATIONAL GUARD BUREAU.JFHQ USPFO VA.USPFO VA PROCUREMENT.W7N5 USPFO ACTIVITY VA ARNG | 2026-06-23 | 2026-07-15T11:00:00-04:00 | Total Small Business Set-Aside (FAR 19.5) |
+
+_…and 435 more added rows._
+
+## Removed
+
+| Key | title |
+|---|---|
+| 020e4fdf58c44814970b1a0514157231 | GIMC Preventative Maintenance Services for two (2) RTHB Series R™ CenTraVac Chillers |
+| 029be8421c824a86bf986079bfd8175c | Demo B5276 & B8129 |
+| 02e454b564e44cf7b2c48fd511b3b9d2 | I-Stat Service Agreement |
+| 03f6a6af2c3e4dff88c3da3ef9083aaa | C1DA--VASDHS SEISMIC STRUCTURAL SURVEY   - \|\| VENDOR \|\| (07/01/26-06/30/28) \| |
+| 041ce54e7a864131803e6354303cb7d7 | Bldg 8, MAN shelter bldg1246, and 1337 Rectifier Replacement |
+| 04a6a4a6b19c4647826942ee3c9d8f8c | Synopsis-Presolicitation Multiple Parts/NSNs |
+| 04ae0ce593d3471fa5df70a89475b17e | Ansys Systems Tool Kit (STK) |
+| 05a3f2d0e74e4fbe9eb3ee8d3c9a3b32 | FAIRING, LAUNCHER GU / NSN 1440-01-285-3096 / LGM-30 |
+| 05b20161209c47ad949e779a87a3e8bf | J061--Maintenance, Inspection, and Testing of the Electrical Power  Distribution System |
+| 061d868711184bb983f42bc8fc1a7922 | 66--GAGE,DP,4.5",0-120 |
+| 0663d3b6241946d3a4fd4863d96cb1c0 | Repair of NIIN 016504230; NOMEN: RDP |
+| 06de285b862c44c9abe3025549429476 | NIH Track System Transformer Upgrade |
+| 06e46cc950fa430e8bc134caa66eb0d6 | HOUSING SECTION,NIG |
+| 0727c59adec54146b5ab7242093af712 | Remanufacture of Electro-mechanical Linear Actuator |
+| 084b4f612b014506ac3d6a660ecc901d | Q403--Police Officer Psychological Exam |
+| 08c741e0c5304fc1b28c506b4454298a | 2026 AGA Annual Professional Development Training (PDT) |
+| 09d6422cd72747c4a0f6d4aee8c0c7f7 | SPE4A526R0222; 1650017205636;Servocylinder |
+| 09e6f55fccdb4805bad5609935e2a69f | Design-Build and Construction Services MATOC to support Industrial Base Modernization at Government Owned - Contractor Operated (GOCO) Facilities |
+| 0a20698d6b0948618b9e7f7236f4f52e | KC-135R EXTINGUISHER, FIRE, AIR, NSN: 1680-01-281-2773JY, PN: 34000004-2 |
+| 0a86057ac6c142c3b9821799467a0d96 | RECEIVER,INFRARED |
+| 0b15f03ab0574656b94238d5348439d1 | CH-53K® Incorporation of Tail Fold Lock Actuator (TFLA) |
+| 0b78c11a59844a97b5be9e29f7b39cee | 6710B UPS Battery Replacement |
+| 0baa5d0e12b248a0897cca57658ea2f1 | 58--NRP,MODULE,ACOUSTIC, IN REPAIR/MODIFICATION OF |
+| 0c19a98a590b42cfbb01e521dc6acb9b | Yuba Gravel Placement |
+| 0d2308d48d9943e98842bd2142dd3dd6 | 16--POD EXHAUST COVER |
+
+_…and 480 more removed rows._
+
