@@ -1,4 +1,7 @@
 camoufox[geoip]==0.4.11
+# Camoufox 0.4.11's cached Firefox binary is incompatible with newer
+# Playwright's viewport protocol; pin to the version that shipped with it.
+playwright==1.49.0
 openpyxl==3.1.5
 pdfplumber==0.11.4
 requests==2.32.3
