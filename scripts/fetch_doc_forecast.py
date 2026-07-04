@@ -15,6 +15,7 @@ import base64
 import hashlib
 import json
 import os
+import random
 import re
 import shutil
 import sys
@@ -26,6 +27,10 @@ from pathlib import Path
 from xml.etree import ElementTree as ET
 
 from camoufox.async_api import AsyncCamoufox
+
+
+class CFTimeout(Exception):
+    """Cloudflare challenge did not clear within this session's wait window."""
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import xlsx_diff
@@ -127,14 +132,10 @@ def emit_output(**kv: str) -> None:
             f.write(f"{k}={v}\n")
 
 
-async def main() -> int:
-    CURRENT_DIR.mkdir(parents=True, exist_ok=True)
-    now_iso = datetime.now(timezone.utc).isoformat()
-
-    prior_meta: dict = {}
-    if METADATA_PATH.exists():
-        prior_meta = json.loads(METADATA_PATH.read_text())
-    prior_by_name = {f["filename"]: f for f in prior_meta.get("files", [])}
+async def _fetch_once(prior_by_name: dict, now_iso: str) -> list[dict]:
+    """Run one Camoufox session. Returns file meta list, or raises CFTimeout."""
+    # Human-like pre-nav jitter (varies each attempt)
+    await asyncio.sleep(random.uniform(3, 8))
 
     async with AsyncCamoufox(
         headless=True,
@@ -150,7 +151,8 @@ async def main() -> int:
         await page.goto(PAGE_URL, wait_until="domcontentloaded", timeout=120000)
 
         title = ""
-        for attempt in range(90):
+        # Shorter per-attempt wait (60s) so we can retry with a fresh browser.
+        for attempt in range(30):
             title = await page.title()
             t = title.lower()
             if title and "moment" not in t and "challenge" not in t:
@@ -160,12 +162,12 @@ async def main() -> int:
                 if attempt % 5 == 0:
                     print(f"[fetch] title cleared ({title!r}) but only {link_count} links — waiting", flush=True)
             elif attempt % 5 == 0:
-                print(f"[fetch] waiting for CF (attempt {attempt+1}/90, title={title!r})", flush=True)
+                print(f"[fetch] waiting for CF (attempt {attempt+1}/30, title={title!r})", flush=True)
             await asyncio.sleep(2)
         else:
             html = await page.content()
             (CURRENT_DIR / "_blocked-snapshot.html").write_text(html)
-            raise RuntimeError(f"Did not reach forecast page; final title={title!r}.")
+            raise CFTimeout(f"CF did not clear in this session; final title={title!r}.")
 
         print(f"[fetch] page loaded, title={title!r}", flush=True)
 
@@ -260,6 +262,38 @@ async def main() -> int:
                 print(f"  -> unchanged (sha matches prior; last changed {meta['last_changed_utc']})", flush=True)
 
             files_meta.append(meta)
+
+    # any_changed is captured; also return it via a sentinel attached to the list.
+    return files_meta, any_changed
+
+
+async def main() -> int:
+    CURRENT_DIR.mkdir(parents=True, exist_ok=True)
+    now_iso = datetime.now(timezone.utc).isoformat()
+
+    prior_meta: dict = {}
+    if METADATA_PATH.exists():
+        prior_meta = json.loads(METADATA_PATH.read_text())
+    prior_by_name = {f["filename"]: f for f in prior_meta.get("files", [])}
+
+    files_meta: list[dict] = []
+    any_changed = False
+    last_error: Exception | None = None
+    MAX_ATTEMPTS = 3
+    for attempt in range(1, MAX_ATTEMPTS + 1):
+        print(f"[fetch] === attempt {attempt}/{MAX_ATTEMPTS} ===", flush=True)
+        try:
+            files_meta, any_changed = await _fetch_once(prior_by_name, now_iso)
+            break
+        except CFTimeout as e:
+            last_error = e
+            print(f"[fetch] attempt {attempt} hit Cloudflare: {e}", flush=True)
+            if attempt < MAX_ATTEMPTS:
+                delay = random.uniform(30, 90)
+                print(f"[fetch] cooling off {delay:.0f}s before retry with a fresh browser", flush=True)
+                await asyncio.sleep(delay)
+    else:
+        raise RuntimeError(f"All {MAX_ATTEMPTS} attempts hit Cloudflare. Last: {last_error}")
 
     if any_changed:
         metadata = {
