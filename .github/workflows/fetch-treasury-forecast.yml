@@ -35,7 +35,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/camoufox
-          key: camoufox-${{ runner.os }}-v1
+          key: camoufox-${{ runner.os }}-v2
 
       - name: Fetch Camoufox browser binary + GeoIP DB (if not cached)
         if: steps.camoufox-cache.outputs.cache-hit != 'true'
