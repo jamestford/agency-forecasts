@@ -1,8 +1,12 @@
 name: Fetch DOC Procurement Forecast
 
+# Schedule disabled 2026-07-04: Cloudflare Turnstile consistently blocks
+# Camoufox from GH Actions Azure IPs (all attempts return 'Just a moment...'
+# indefinitely). DOC now runs weekly on James's Mac via launchd
+# (~/Library/LaunchAgents/com.jamestford.agency-forecasts-doc.plist), which
+# has a residential IP that CF accepts. Kept the workflow for manual
+# dispatch in case CF ever eases up.
 on:
-  schedule:
-    - cron: '0 12 * * 1'
   workflow_dispatch:
 
 permissions:
