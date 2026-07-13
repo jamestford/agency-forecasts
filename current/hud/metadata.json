@@ -1,16 +1,16 @@
 {
   "source_page_url": "https://www.hud.gov/stat/sdb/forecast",
-  "last_checked_utc": "2026-06-01T14:15:58.640827+00:00",
+  "last_checked_utc": "2026-07-13T12:56:49.654876+00:00",
   "files": [
     {
       "filename": "HUD-Forecast-FY26-27.xlsx",
       "source_url": "https://www.hud.gov/sites/dfiles/SDB/documents/HUD-Forecast-FY26-27.xlsx",
-      "sha256": "c358809ce749d10a2d48662b48c5ea082e9ee1b141c4221ce217bdd214df16f7",
-      "bytes": 107451,
-      "source_last_modified": "Fri, 29 May 2026 16:15:02 GMT",
-      "source_etag": "\"1a3bb-652f725a6ca34\"",
-      "diff_summary": "+0 added, -172 removed, ~0 modified, =0 unchanged (172\u21920 rows)",
-      "last_changed_utc": "2026-06-01T14:15:58.640827+00:00"
+      "sha256": "96c2dff1438eb0b659b2b7d6e5098dbd0ae1ee9439268450f885ad6dec4b6101",
+      "bytes": 108294,
+      "source_last_modified": "Tue, 30 Jun 2026 15:53:25 GMT",
+      "source_etag": "\"1a706-6557a9345fdd6\"",
+      "diff_summary": "+172 added, -0 removed, ~0 modified, =0 unchanged (0\u2192172 rows)",
+      "last_changed_utc": "2026-07-13T12:56:49.654876+00:00"
     }
   ]
 }
