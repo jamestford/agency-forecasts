@@ -1,17 +1,17 @@
 {
   "source_page_url": "https://www.commerce.gov/oam/industry/procurement-forecasts",
-  "last_checked_utc": "2026-07-04T22:14:13.970389+00:00",
+  "last_checked_utc": "2026-07-13T12:00:06.343859+00:00",
   "files": [
     {
       "filename": "DOC Weekly Forecast Report.xlsx",
       "source_url": "https://www.commerce.gov/sites/default/files/2022-12/DOC%20Weekly%20Forecast%20Report.xlsx",
-      "sha256": "6bb6a825d1dd7d1474c57c0aed0ac7f89b78c9dbe84ac88abae899c1fff0684a",
-      "bytes": 417849,
-      "source_last_modified": "Mon, 22 Jun 2026 17:41:32 GMT",
-      "source_etag": "\"6a3973cc-66039\"",
-      "xlsx_dcterms_modified": "2026-06-22T17:38:11Z",
-      "last_changed_utc": "2026-07-04T22:14:13.970389+00:00",
-      "diff_summary": "+321 added, -2145 removed, ~60 modified, =1247 unchanged (3452\u21921628 rows)"
+      "sha256": "b89364eaec501e2d58aae568e4c62b9a029d440e49e18db321190a28e2ef82d4",
+      "bytes": 422401,
+      "source_last_modified": "Mon, 06 Jul 2026 17:22:35 GMT",
+      "source_etag": "\"6a4be45b-67201\"",
+      "xlsx_dcterms_modified": "2026-07-06T17:20:23Z",
+      "last_changed_utc": "2026-07-13T12:00:06.343859+00:00",
+      "diff_summary": "+52 added, -26 removed, ~7 modified, =1595 unchanged (1628\u21921654 rows)"
     }
   ]
 }
