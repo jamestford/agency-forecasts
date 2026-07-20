@@ -1,16 +1,16 @@
 {
   "source_page_url": "https://www.energy.gov/osdbu/acquisition-forecast",
-  "last_checked_utc": "2026-06-15T14:21:35.887463+00:00",
+  "last_checked_utc": "2026-07-20T12:51:44.419640+00:00",
   "files": [
     {
-      "filename": "OSBP Acquisition Forecast Public 2026-06-11.xlsx",
-      "source_url": "https://www.energy.gov/sites/default/files/2026-06/OSBP%20Acquisition%20Forecast%20Public%202026-06-11.xlsx",
-      "sha256": "8edab4923fda325b787d1fbb78ff84929230b17cef54e26c8e78dc78dc07619a",
-      "bytes": 134487,
-      "source_last_modified": "Thu, 11 Jun 2026 18:03:01 GMT",
+      "filename": "OSBP Acquisition Forecast Public Version for Web.xlsx",
+      "source_url": "https://www.energy.gov/sites/default/files/2026-07/OSBP%20Acquisition%20Forecast%20Public%20Version%20for%20Web.xlsx",
+      "sha256": "2eb9f4e95ff36efc3bf7a8a34f6b355d0ce2e0cb0525919f44f72a8beb42a177",
+      "bytes": 135105,
+      "source_last_modified": "Tue, 14 Jul 2026 15:21:45 GMT",
       "source_etag": null,
-      "diff_summary": "+73 added, -71 removed, ~561 modified, =254 unchanged (886\u2192888 rows)",
-      "last_changed_utc": "2026-06-15T14:21:35.887463+00:00"
+      "diff_summary": "+75 added, -93 removed, ~795 modified, =0 unchanged (888\u2192870 rows)",
+      "last_changed_utc": "2026-07-20T12:51:44.419640+00:00"
     }
   ]
 }
