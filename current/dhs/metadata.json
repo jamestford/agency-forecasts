@@ -2,15 +2,15 @@
   "source": "DHS APFS public API",
   "source_page_url": "https://apfs-cloud.dhs.gov/forecast/",
   "source_api_url": "https://apfs-cloud.dhs.gov/api/forecast/",
-  "last_checked_utc": "2026-07-27T13:06:18.519392+00:00",
+  "last_checked_utc": "2026-08-03T13:05:16.694603+00:00",
   "files": [
     {
       "filename": "forecast.json",
-      "content_sha256": "0aac1a7f63d662a8a5a7ee2712c0d44f2fd8638aba325d41794fad9148b484df",
-      "bytes": 1002427,
-      "count": 770,
-      "diff_summary": "+59 added, -42 removed, ~7 modified, =704 unchanged (753\u2192770 rows)",
-      "last_changed_utc": "2026-07-27T13:06:18.519392+00:00"
+      "content_sha256": "fc3c1a5105b58d50181c79e419c44ab1b3a1d3d39800959d9c6f6b85fb87e861",
+      "bytes": 932993,
+      "count": 717,
+      "diff_summary": "+51 added, -104 removed, ~6 modified, =660 unchanged (770\u2192717 rows)",
+      "last_changed_utc": "2026-08-03T13:05:16.694603+00:00"
     }
   ]
 }
