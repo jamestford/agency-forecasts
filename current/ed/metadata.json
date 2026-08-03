@@ -1,15 +1,16 @@
 {
   "source_page_url": "https://www.ed.gov/about/doing-business-ed/contract-opportunities/forecast-of-ed-contract-opportunities",
-  "last_checked_utc": "2026-07-04T21:48:17.727328+00:00",
+  "last_checked_utc": "2026-08-03T13:06:52.194170+00:00",
   "files": [
     {
-      "filename": "us-department-of-education-procurement-forecast-apr-2026-114098.xlsx",
-      "source_url": "https://www.ed.gov/media/document/us-department-of-education-procurement-forecast-apr-2026-114098.xlsx",
-      "sha256": "8e0a5269fe5c025387602da8fb848359ec6d43c8a7c09d63ae046e474d7b79b3",
-      "bytes": 39933,
-      "source_last_modified": "Thu, 21 May 2026 18:50:50 GMT",
+      "filename": "us-department-of-education-procurement-forecast-july-23-2026-114098.xlsx",
+      "source_url": "https://www.ed.gov/media/document/us-department-of-education-procurement-forecast-july-23-2026-114098.xlsx",
+      "sha256": "c38e7402e8960852b1c7e4200770d813fbef60c263f14e587c9fd118a29902b0",
+      "bytes": 46471,
+      "source_last_modified": "Thu, 30 Jul 2026 18:40:11 GMT",
       "source_etag": null,
-      "last_changed_utc": "2026-07-04T21:48:17.727328+00:00"
+      "diff_summary": "+207 added, -92 removed, ~109 modified, =56 unchanged (257\u2192372 rows)",
+      "last_changed_utc": "2026-08-03T13:06:52.194170+00:00"
     }
   ]
 }
