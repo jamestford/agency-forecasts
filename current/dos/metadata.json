@@ -1,15 +1,16 @@
 {
   "source_page_url": "https://www.state.gov/Procurement-Forecast",
-  "last_checked_utc": "2026-05-13T15:35:52.331090+00:00",
+  "last_checked_utc": "2026-08-24T12:12:06.254993+00:00",
   "files": [
     {
-      "filename": "FY26-Procurement-Forecast-4.xlsx",
-      "source_url": "https://www.state.gov/wp-content/uploads/2026/04/FY26-Procurement-Forecast-4.xlsx",
-      "sha256": "ae49502e31cbafcc9b066910c9bba7d0ac1fbe7096824e4979533281629674b8",
-      "bytes": 116353,
-      "source_last_modified": "Thu, 16 Apr 2026 17:38:13 GMT",
-      "source_etag": "\"95ca0257cc3377aade4c734ada9702a2\"",
-      "last_changed_utc": "2026-05-13T15:35:52.331090+00:00"
+      "filename": "FY26-Procurement-Forecast-Update.xlsx",
+      "source_url": "https://www.state.gov/wp-content/uploads/2026/08/FY26-Procurement-Forecast-Update.xlsx",
+      "sha256": "bf0235edbd988b6c05e4f6b884d44aede95d739ededed4d9cbbf2f8cbad39ea5",
+      "bytes": 136231,
+      "source_last_modified": "Thu, 20 Aug 2026 19:35:04 GMT",
+      "source_etag": "\"e955b9b95b9b1c1c0377688d9f57738b\"",
+      "diff_summary": "+74 added, -433 removed, ~0 modified, =0 unchanged (433\u219274 rows)",
+      "last_changed_utc": "2026-08-24T12:12:06.254993+00:00"
     }
   ]
 }
