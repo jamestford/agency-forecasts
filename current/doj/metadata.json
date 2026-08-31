@@ -1,16 +1,16 @@
 {
   "source_page_url": "https://www.justice.gov/jmd/doj-forecast-contracting-opportunities",
-  "last_checked_utc": "2026-06-08T13:32:39.368264+00:00",
+  "last_checked_utc": "2026-08-31T12:18:58.460252+00:00",
   "files": [
     {
-      "filename": "Forecasted Contracting Opportunities Data _6-03-2026.xlsx",
+      "filename": "Forecast of Contracting Opportunities 8-27-2026.xlsx",
       "source_url": "https://www.justice.gov/media/1381791/dl",
-      "sha256": "cd2e13a7933ebcedc9cd122f48fe3ba10e24d6d6d9f1ffa178badfae80b72cb5",
-      "bytes": 1896175,
-      "source_last_modified": "Fri, 05 Jun 2026 17:17:01 GMT",
+      "sha256": "a965df29ae24d7b00e4a21fce45336b9fbcbbbc364da15f197e830ddcc61abfb",
+      "bytes": 1865502,
+      "source_last_modified": "Thu, 27 Aug 2026 13:26:53 GMT",
       "source_etag": null,
-      "diff_summary": "+152 added, -140 removed, ~334 modified, =13 unchanged (487\u2192499 rows)",
-      "last_changed_utc": "2026-06-08T13:32:39.368264+00:00"
+      "diff_summary": "+123 added, -166 removed, ~26 modified, =307 unchanged (499\u2192456 rows)",
+      "last_changed_utc": "2026-08-31T12:18:58.460252+00:00"
     }
   ]
 }
